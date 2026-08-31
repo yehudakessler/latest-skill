@@ -1,0 +1,9 @@
+{
+  "name": "latest",
+  "version": "0.1.0",
+  "description": "Search for today, not for your cutoff — a freshness discipline for AI web search. Date-laddered search (newest first, walk back only when nothing newer exists), every source dated, every answer stamped, honest labels when verification fails.",
+  "author": {
+    "name": "Yehuda Kessler"
+  },
+  "keywords": ["search", "freshness", "web-research", "recency", "stale-data"]
+}

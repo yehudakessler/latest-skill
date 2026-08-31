@@ -11,17 +11,17 @@ description: Find the NEWEST sources on any changeable fact — prices, plans, u
 - **Use for changeable facts:** versions, models, prices, limits, plans, features, rules/laws, schedules, availability, "latest/best", news.
 - **Not for measured evidence** (papers, benchmarks, studies, taxonomies) — evidence never expires. Judge it by the generation rule: every AI capability/limitation claim names the model it was measured on; a limitation measured on an older generation is a hypothesis to re-test, never a fact; a demonstrated ability may be assumed to carry forward; old failure modes stay risks to measure, not rates to quote.
 
-## Two modes — check once per session
+## Two modes — the script always works
 
-**Mode A — search adapter configured** (a key for Tavily, Serper, or Brave in `~/.latest-search/config.json`): use the ladder script. It gives real date filtering.
+**Mode A — the ladder script.** It needs NO setup: with no config it rides the public Google News RSS feed — free, keyless, real dates (news sites only). With a free API key in `~/.latest-search/config.json` (Tavily/Serper/Brave — see the README) the same ladder covers the full web. A keyed engine that errors falls back to the news feed by itself and prints a `FALLBACK:` line.
 
-**Mode B — no adapter**: use the built-in WebSearch/WebFetch tools with the manual discipline below. It is weaker (no true date filter) but the rules still hold.
+**Mode B — manual discipline** on the built-in WebSearch/WebFetch: used for the detail phase after the ladder, and as the whole procedure only when the script cannot run at all (no Node, or every engine blocked). Weaker — no true date filter — but the rules still hold.
 
-Check with: `node "${CLAUDE_PLUGIN_ROOT}/scripts/latest-search.mjs" --check` (prints the configured engine, or `NO ENGINE`). If `CLAUDE_PLUGIN_ROOT` is not set in your environment, the script lives at `../../scripts/latest-search.mjs` relative to this file.
+Check the engine with: `node "${CLAUDE_PLUGIN_ROOT}/scripts/latest-search.mjs" --check`. If `CLAUDE_PLUGIN_ROOT` is not set in your environment, the script lives at `../../scripts/latest-search.mjs` relative to this file.
 
-## Procedure — Mode A (adapter)
+## Procedure — Mode A (the ladder)
 
-1. **Ladder first, by machine.** `node "${CLAUDE_PLUGIN_ROOT}/scripts/latest-search.mjs" "<topic>"`. It walks past day → week → month → year → any time and stops at the first rung with hits. Output: a `SOURCE | RUNG | tried` line, `NEWEST: <age>`, then numbered rows `date | title | url` + snippet. The `NEWEST` age and the names/versions inside the rows are the **current anchor**. One run per topic per session; reuse it for follow-ups. Flags: `--rung d|w|m|y|any` (force one rung), `--max 20`, `--json`.
+1. **Ladder first, by machine.** `node "${CLAUDE_PLUGIN_ROOT}/scripts/latest-search.mjs" "<topic>"`. It walks past hour (news/Serper) → day → week → month → year → any time and stops at the first rung with hits. On the keyless news engine, cite results by title + source (the links are Google News redirects — open the article via WebFetch when you need its text). Output: a `SOURCE | RUNG | tried` line, `NEWEST: <age>`, then numbered rows `date | title | url` + snippet. The `NEWEST` age and the names/versions inside the rows are the **current anchor**. One run per topic per session; reuse it for follow-ups. Flags: `--rung h|d|w|m|y|any` (force one rung), `--max 20`, `--json`.
 2. **Primary page + its date.** Open the official page (help center, pricing page, release notes, changelog) and read its "Updated …" / published line. The official page beats every aggregator.
 3. **Detail searches anchored.** Follow-up WebSearch/WebFetch queries now carry the version/date the ladder found (or the current month + year — never a year you remember). A source naming an older version/year than the ladder found is stale → re-search; never patch an old number into the answer.
 4. **Newest wins; stamp it.** A newer dated source beats an older one unless it is an unconfirmed rumor; say which you took. Every changing fact in the answer carries "as of \<date\>, \<version\>". If the ladder only found hits at month/year/any-time, lead with "newest source found is from \<date\>", say the fact may have changed since, and still answer in full — only *silent* staleness is banned.
@@ -36,8 +36,8 @@ Same rules, done by hand:
 4. **Label honestly when verification fails.** If you cannot establish a date for a claim you must still make, label it explicitly: `undated/unverified as of <today>`. Never fall back to "what I remember" silently — memory is the oldest source in the room.
 
 ## When the script complains
-- `NO ENGINE` (exit 2): no adapter configured — fall back to Mode B. The script writes a stamp with `mode:"no-engine"` so a wired gate opens instead of dead-ending (see README → the gate recipe).
-- `ENGINE ERROR` / rate limit (exit 2): the adapter failed; the stamp says `mode:"blocked"`. Fall back to Mode B and label every changeable-fact claim `undated/unverified — ladder blocked`. Never retry a rate-limited API in a loop.
+- `ENGINE ERROR` + `FALLBACK:` line (exit 0): the keyed engine failed and the news feed answered instead — use those results; they are real and dated, just news-only.
+- Exit 2 means EVERY engine failed (keyed engine AND the news feed); the stamp says `mode:"blocked"`. Fall back to Mode B and label every changeable-fact claim `undated/unverified — ladder blocked`. Never retry a rate-limited API in a loop.
 - `COUNT: 0` at any-time: the topic genuinely has no coverage — say so; do not invent.
 
 ## Sub-agents / research fleets

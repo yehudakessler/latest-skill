@@ -1,5 +1,6 @@
 {
   "name": "latest-skill",
+  "description": "Home of the latest plugin — a freshness discipline that makes AI agents search for today, not for their training cutoff.",
   "owner": {
     "name": "Yehuda Kessler",
     "url": "https://github.com/yehudakessler"

@@ -1,0 +1,18 @@
+{
+  "name": "latest-skill",
+  "owner": {
+    "name": "Yehuda Kessler",
+    "url": "https://github.com/yehudakessler"
+  },
+  "plugins": [
+    {
+      "name": "latest",
+      "source": "./",
+      "description": "Search for today, not for your cutoff — a freshness discipline for AI web search. Date-laddered search (newest first), every source dated, every answer stamped. Works completely free.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Yehuda Kessler"
+      }
+    }
+  ]
+}
